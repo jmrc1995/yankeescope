@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
-app.use('/players', playersRoute);
+app.use('/players', playersRoute); 
 app.use(express.json());
 
 app.get('/', (_req, res) => {

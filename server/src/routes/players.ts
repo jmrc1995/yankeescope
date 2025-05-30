@@ -1,8 +1,10 @@
 import express from 'express';
-import { getAllPlayers } from '../controllers/playersController';
+import { getAllPlayers, comparePlayers } from '../controllers/playersController';
 
 const router = express.Router();
 
-router.get('/', getAllPlayers); // Handles GET /players
+router.get('/', getAllPlayers);       
+router.get('/compare', comparePlayers);    
+
 
 export default router;
