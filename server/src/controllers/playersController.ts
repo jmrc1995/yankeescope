@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import { pool } from '../db/pool';
+import { generateComparisonSummary } from '../utils/generateComparisonSummary';
+
 
 export const getAllPlayers = async (_req: Request, res: Response) => {
   try {
@@ -31,9 +33,16 @@ export const comparePlayers = async (
       return;
     }
 
+    const p1 = result1.rows[0];
+    const p2 = result2.rows[0];
+
+    // ✅ Only generate summary if both players have required stat fields
+    const summary = generateComparisonSummary(p1, p2);
+
     res.json({
-      player1: result1.rows[0],
-      player2: result2.rows[0],
+      player1: p1,
+      player2: p2,
+      summary, // ✅ Add the summary here
     });
   } catch (err) {
     console.error('Error comparing players:', err);
