@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { Request, Response } from 'express';
 import { pool } from '../db/pool';
 import { generateComparisonSummary } from '../utils/generateComparisonSummary';
@@ -25,27 +26,20 @@ export const comparePlayers = async (
   }
 
   try {
-    const result1 = await pool.query('SELECT * FROM players WHERE name ILIKE $1', [player1]);
-    const result2 = await pool.query('SELECT * FROM players WHERE name ILIKE $1', [player2]);
+    // Fetch from your own endpoint so you reuse logic
+    const [res1, res2] = await Promise.all([
+      axios.get(`http://localhost:3001/mlb/player?name=${encodeURIComponent(player1)}`),
+      axios.get(`http://localhost:3001/mlb/player?name=${encodeURIComponent(player2)}`)
+    ]);
 
-    if (result1.rows.length === 0 || result2.rows.length === 0) {
-      res.status(404).json({ message: 'One or both players not found' });
-      return;
-    }
+    const p1 = res1.data;
+    const p2 = res2.data;
 
-    const p1 = result1.rows[0];
-    const p2 = result2.rows[0];
-
-    // ✅ Only generate summary if both players have required stat fields
     const summary = generateComparisonSummary(p1, p2);
 
-    res.json({
-      player1: p1,
-      player2: p2,
-      summary, // ✅ Add the summary here
-    });
-  } catch (err) {
-    console.error('Error comparing players:', err);
-    res.status(500).json({ message: 'Server error' });
+    res.json({ player1: p1, player2: p2, summary });
+  } catch (err: any) {
+    console.error('Error comparing players:', err?.response?.data || err.message);
+    res.status(500).json({ message: 'Stats not available for one or both players' });
   }
 };
