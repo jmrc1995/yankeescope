@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { generateComparisonSummary } from "../../../server/src/utils/generateComparisonSummary";
 
 interface Player {
   id: number;
   name: string;
   position: string;
-  is_pitcher: boolean;
-  is_active: boolean;
 }
 
 export default function PlayerCompare() {
@@ -15,26 +14,48 @@ export default function PlayerCompare() {
   const [comparison, setComparison] = useState<any>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3001/players")
+    fetch("http://localhost:3001/mlb/roster") // ← use your new route
       .then((res) => res.json())
       .then((data) => {
-        console.log("Players:", data); // 👈 Add this
-        setPlayers(data);
+        console.log("Live roster:", data);
+        setPlayers(data); // ✅ updates dropdown list
       })
       .catch((err) => {
-        console.error("Error fetching players:", err);
+        console.error("Error fetching roster:", err);
       });
   }, []);
 
-  const handleCompare = async () => {
-    const res = await fetch(
-      `http://localhost:3001/players/compare?player1=${encodeURIComponent(
-        player1
-      )}&player2=${encodeURIComponent(player2)}`
+const handleCompare = async () => {
+  try {
+    const res1 = await fetch(
+      `http://localhost:3001/mlb/player?name=${encodeURIComponent(player1)}`
     );
-    const data = await res.json();
-    setComparison(data);
-  };
+    const res2 = await fetch(
+      `http://localhost:3001/mlb/player?name=${encodeURIComponent(player2)}`
+    );
+
+    const data1 = await res1.json();
+    const data2 = await res2.json();
+
+    if (
+      !data1 || !data2 ||
+      data1.home_runs === undefined || data2.home_runs === undefined
+    ) {
+      alert("Stats not available for one or both players.");
+      return;
+    }
+
+    setComparison({
+      player1: data1,
+      player2: data2,
+      summary: generateComparisonSummary(data1, data2),
+    });
+  } catch (err) {
+    console.error("Error comparing players:", err);
+    alert("Something went wrong while fetching player data.");
+  }
+};
+
 
   return (
     <div
