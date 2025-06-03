@@ -3,6 +3,40 @@ import { Request, Response } from 'express';
 import { pool } from '../db/pool';
 import { generateComparisonSummary } from '../utils/generateComparisonSummary';
 
+export const getYankeesStatLeaders = async (_req: Request, res: Response) => {
+  try {
+    const rosterRes = await axios.get(
+      "https://statsapi.mlb.com/api/v1/teams/147/roster?rosterType=40Man"
+    );
+    const roster = rosterRes.data.roster;
+
+    const currentYear = new Date().getFullYear();
+    const playerStats = await Promise.all(
+      roster.map(async (p: any) => {
+        const statsRes = await axios.get(
+          `https://statsapi.mlb.com/api/v1/people/${p.person.id}/stats?stats=season&season=${currentYear}`
+        );
+        const stats = statsRes.data.stats?.[0]?.splits?.[0]?.stat || {};
+
+        return {
+          id: p.person.id,
+          name: p.person.fullName,
+          position: p.position.abbreviation,
+          homeRuns: parseInt(stats.homeRuns ?? "0"),
+          war: parseFloat(stats.war ?? "0"),
+          ops: parseFloat(stats.ops ?? "0"),
+          sprintSpeed: parseFloat(stats.sprintSpeed ?? "0"),
+          exitVelocity: parseFloat(stats.avgHitSpeed ?? "0"), // depends on stat availability
+        };
+      })
+    );
+
+    res.json(playerStats);
+  } catch (err) {
+    console.error("Error fetching Yankees stats:", err);
+    res.status(500).json({ message: "Failed to fetch Yankees stats" });
+  }
+};
 
 export const getAllPlayers = async (_req: Request, res: Response) => {
   try {

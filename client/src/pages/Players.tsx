@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { generateComparisonSummary } from "../../../server/src/utils/generateComparisonSummary";
+import judgeAnime from "../assets/aaron_judge_anime.png";
+import antAnime from "../assets/anthony_volpe_anime.png"
 
 interface Player {
   id: number;
@@ -58,95 +60,125 @@ export default function PlayerCompare() {
     }
   };
 
-return (
-  
-  <div className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-200 px-6 py-12">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-slate-100 to-slate-200 px-6 py-12">
+      <div className="max-w-6xl mx-auto">
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-slate-900 tracking-tight mb-3">
+            YANKEESCOPE{" "}
+            <span role="img" aria-label="baseball">
+              ⚾
+            </span>
+          </h1>
+          <p className="text-lg text-slate-600">
+            Compare Yankees players by their performance stats
+          </p>
+        </header>
 
-    <div className="max-w-6xl mx-auto">
-      <header className="text-center mb-12">
-        <h1 className="text-5xl font-bold text-slate-900 tracking-tight mb-3">
-          YankeeScope <span role="img" aria-label="baseball">⚾</span>
-        </h1>
-        <p className="text-lg text-slate-600">
-          Compare Yankees players by their performance stats
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-        <select
-          className="p-4 rounded-xl bg-white border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500"
-          value={player1}
-          onChange={(e) => setPlayer1(e.target.value)}
-        >
-          <option value="">Select Player 1</option>
-          {players.map((p) => (
-            <option key={p.id} value={p.name}>{p.name}</option>
-          ))}
-        </select>
-
-        <select
-          className="p-4 rounded-xl bg-white border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500"
-          value={player2}
-          onChange={(e) => setPlayer2(e.target.value)}
-        >
-          <option value="">Select Player 2</option>
-          {players.map((p) => (
-            <option key={p.id} value={p.name}>{p.name}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="text-center">
-        <button
-          onClick={handleCompare}
-          disabled={!player1 || !player2}
-          className={`px-8 py-3 font-semibold rounded-full transition-all ${
-            !player1 || !player2
-              ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-              : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg"
-          }`}
-        >
-          Compare Players
-        </button>
-      </div>
-
-      {comparison && (
-        <section className="mt-16">
-          <h2 className="text-3xl font-semibold text-center text-slate-800 mb-10">
-            {comparison.player1.name} vs {comparison.player2.name}
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[comparison.player1, comparison.player2].map((player) => (
-              <div
-                key={player.name}
-                className="bg-white border border-slate-200 rounded-2xl shadow-md hover:shadow-xl p-6 transition duration-300"
-              >
-                <h3 className="text-2xl font-bold text-slate-800 mb-2">
-                  ⚾ {player.name}
-                </h3>
-                <div className="space-y-2 text-slate-700 text-lg">
-                  <p><strong>Position:</strong> {player.position}</p>
-                  <p><strong>Home Runs:</strong> {player.home_runs}</p>
-                  <p><strong>Batting Avg:</strong> {player.batting_avg}</p>
-                  <p><strong>OBP:</strong> {player.obp}</p>
-                  <p><strong>RBIs:</strong> {player.rbis}</p>
-                  <p><strong>Stolen Bases:</strong> {player.stolen_bases}</p>
-                </div>
-              </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <select
+            className="p-4 rounded-xl bg-white border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500"
+            value={player1}
+            onChange={(e) => setPlayer1(e.target.value)}
+          >
+            <option value="">Select Player 1</option>
+            {players.map((p) => (
+              <option key={p.id} value={p.name}>
+                {p.name}
+              </option>
             ))}
-          </div>
+          </select>
 
-          <div className="mt-12 max-w-4xl mx-auto bg-white text-slate-800 p-6 text-lg rounded-2xl shadow border border-slate-200 leading-relaxed">
-            {comparison.summary}
-          </div>
-        </section>
-      )}
+          <select
+            className="p-4 rounded-xl bg-white border border-slate-300 shadow-sm focus:ring-2 focus:ring-indigo-500"
+            value={player2}
+            onChange={(e) => setPlayer2(e.target.value)}
+          >
+            <option value="">Select Player 2</option>
+            {players.map((p) => (
+              <option key={p.id} value={p.name}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="text-center">
+          <button
+            onClick={handleCompare}
+            disabled={!player1 || !player2}
+            className={`px-8 py-3 font-semibold rounded-full transition-all ${
+              !player1 || !player2
+                ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg"
+            }`}
+          >
+            Compare Players
+          </button>
+        </div>
+
+        {comparison && (
+          <section className="mt-16">
+            <h2 className="text-3xl font-semibold text-center text-gray-800 mb-10">
+              {comparison.player1.name} vs {comparison.player2.name}
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {[comparison.player1, comparison.player2].map((player) => (
+                <div
+                  key={player.name}
+                  className="bg-white rounded-2xl shadow-lg p-6 transition hover:shadow-xl"
+                >
+                  {/* Show Judge anime image if it's him */}
+                  {player.name === "Aaron Judge" && (
+                    <img
+                      src={judgeAnime}
+                      alt="Aaron Judge Anime"
+                      className="w-full h-60 object-contain rounded-xl mx-auto mb-4"
+                    />
+                  )}
+                  {/* Show Volpe anime image if it's him */}
+                  {player.name === "Anthony Volpe" && (
+                    <img
+                      src={antAnime}
+                      alt="Anthony Volpe Anime"
+                      className="w-full h-60 object-contain rounded-xl mx-auto mb-4"
+                    />
+                  )}
+
+                  <h3 className="text-xl font-bold text-gray-800 mb-4">
+                    ⚾ {player.name}
+                  </h3>
+                  <ul className="space-y-2 text-gray-600 text-left">
+                    <li>
+                      <strong>Position:</strong> {player.position}
+                    </li>
+                    <li>
+                      <strong>Home Runs:</strong> {player.home_runs}
+                    </li>
+                    <li>
+                      <strong>Batting Avg:</strong> {player.batting_avg}
+                    </li>
+                    <li>
+                      <strong>OBP:</strong> {player.obp}
+                    </li>
+                    <li>
+                      <strong>RBIs:</strong> {player.rbis}
+                    </li>
+                    <li>
+                      <strong>Stolen Bases:</strong> {player.stolen_bases}
+                    </li>
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-12 max-w-4xl mx-auto bg-white text-slate-800 p-6 text-lg rounded-2xl shadow border border-slate-200 leading-relaxed">
+              {comparison.summary}
+            </div>
+          </section>
+        )}
+      </div>
     </div>
-  </div>
-);
-
-
-
-
+  );
 }
