@@ -32,14 +32,6 @@ Coming soon…
 
 ---
 
-## 📸 Screenshots
-
-> Add screenshots below once deployed  
-![Live Game Card](./client/public/demo-game-card.png)  
-![Stat Leader Row](./client/public/demo-stat-row.png)
-
----
-
 ## 🛠️ Setup Instructions
 
 1. Clone the repo
