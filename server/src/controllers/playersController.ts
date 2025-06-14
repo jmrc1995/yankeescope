@@ -26,7 +26,7 @@ export const getYankeesStatLeaders = async (_req: Request, res: Response) => {
           war: parseFloat(stats.war ?? "0"),
           ops: parseFloat(stats.ops ?? "0"),
           sprintSpeed: parseFloat(stats.sprintSpeed ?? "0"),
-          exitVelocity: parseFloat(stats.avgHitSpeed ?? "0"), // depends on stat availability
+          exitVelocity: parseFloat(stats.avgHitSpeed ?? "0"), 
         };
       })
     );
@@ -47,7 +47,6 @@ export const getAllPlayers = async (_req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 export const comparePlayers = async (
   req: Request<{}, {}, {}, { player1?: string; player2?: string }>,
   res: Response
@@ -60,20 +59,61 @@ export const comparePlayers = async (
   }
 
   try {
-    // Fetch from your own endpoint so you reuse logic
     const [res1, res2] = await Promise.all([
       axios.get(`http://localhost:3001/mlb/player?name=${encodeURIComponent(player1)}`),
-      axios.get(`http://localhost:3001/mlb/player?name=${encodeURIComponent(player2)}`)
+      axios.get(`http://localhost:3001/mlb/player?name=${encodeURIComponent(player2)}`),
     ]);
 
     const p1 = res1.data;
     const p2 = res2.data;
 
-    const summary = generateComparisonSummary(p1, p2);
+    const summary = generateComparisonSummary(p1, p2); 
 
     res.json({ player1: p1, player2: p2, summary });
   } catch (err: any) {
     console.error('Error comparing players:', err?.response?.data || err.message);
     res.status(500).json({ message: 'Stats not available for one or both players' });
+  }
+};
+
+
+export const getYankeesGame = async (_req: Request, res: Response) => {
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    const url = `https://statsapi.mlb.com/api/v1/schedule?teamId=147&sportId=1&date=${today}&hydrate=linescore`;
+
+    const response = await axios.get(url);
+    const game = response.data.dates?.[0]?.games?.[0];
+
+    if (!game) {
+      res.status(404).json({ message: "No Yankees game today" });
+      return;
+    }
+
+    const {
+      teams,
+      venue,
+      status,
+      linescore,
+    } = game;
+
+    res.json({
+      home: {
+        name: teams.home.team.name,
+        score: teams.home.score,
+      },
+      away: {
+        name: teams.away.team.name,
+        score: teams.away.score,
+      },
+      venue: venue.name,
+      state: status.detailedState,
+      abstractState: status.abstractGameState,
+      inning: linescore?.currentInning ?? null,
+      half: linescore?.inningHalf ?? null,
+    });
+  } catch (err) {
+    console.error("Error fetching Yankees game:", err);
+    res.status(500).json({ message: "Failed to fetch Yankees game" });
   }
 };
