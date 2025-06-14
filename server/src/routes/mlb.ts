@@ -1,9 +1,12 @@
 import express from 'express';
-import { getPlayerStats, getYankeesRoster } from '../controllers/mlbController';
+import { getPlayerStats, getFullRosterWithStats, getYankeesGame  } from '../controllers/mlbController';
+
+
 
 const router = express.Router();
 
 router.get('/player', getPlayerStats);
-router.get('/roster', getYankeesRoster);
+router.get('/yankees-game', getYankeesGame);
+router.get("/roster", getFullRosterWithStats);
 
 export default router;
